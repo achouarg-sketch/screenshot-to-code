@@ -14,10 +14,23 @@ interface Props {
 }
 
 function CodeTab({ code, setCode, settings }: Props) {
-  const copyForWordPress = useCallback(() => {
-    const wordpressCode = toWordPressWidgetCode(code);
-    copy(wordpressCode);
-    toast.success("WordPress widget code copied");
+  const copyForWordPress = useCallback(async () => {
+    const toastId = toast.loading("Preparing WordPress code...");
+
+    try {
+      const wordpressCode = await toWordPressWidgetCode(code);
+      const didCopy = copy(wordpressCode);
+      if (!didCopy) {
+        throw new Error("Clipboard copy failed");
+      }
+
+      toast.success("WordPress code copied with portable images", {
+        id: toastId,
+      });
+    } catch (error) {
+      console.error("Could not prepare WordPress export", error);
+      toast.error("Could not prepare WordPress code", { id: toastId });
+    }
   }, [code]);
 
   const doOpenInCodepenio = useCallback(async () => {
