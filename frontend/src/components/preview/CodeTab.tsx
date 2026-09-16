@@ -5,6 +5,7 @@ import { Settings } from "../../types";
 import copy from "copy-to-clipboard";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
+import { toWordPressWidgetCode } from "./wordpressExport";
 
 interface Props {
   code: string;
@@ -13,16 +14,16 @@ interface Props {
 }
 
 function CodeTab({ code, setCode, settings }: Props) {
-  const copyCode = useCallback(() => {
-    copy(code);
-    toast.success("Copied to clipboard");
+  const copyForWordPress = useCallback(() => {
+    const wordpressCode = toWordPressWidgetCode(code);
+    copy(wordpressCode);
+    toast.success("WordPress widget code copied");
   }, [code]);
 
   const doOpenInCodepenio = useCallback(async () => {
-    // TODO: Update CSS and JS external links depending on the framework being used
     const data = {
       html: code,
-      editors: "100", // 1: Open HTML, 0: Close CSS, 0: Close JS
+      editors: "100",
       layout: "left",
       css_external:
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" +
@@ -36,8 +37,6 @@ function CodeTab({ code, setCode, settings }: Props) {
           : ""),
     };
 
-    // Create a hidden form and submit it to open the code in CodePen
-    // Can't use fetch API directly because we want to open the URL in a new tab
     const input = document.createElement("input");
     input.setAttribute("type", "hidden");
     input.setAttribute("name", "data");
@@ -57,12 +56,12 @@ function CodeTab({ code, setCode, settings }: Props) {
     <div className="relative">
       <div className="flex justify-start items-center px-4 mb-2">
         <span
-          title="Copy Code"
+          title="Copy for WordPress"
           className="bg-black text-white flex items-center justify-center hover:text-black hover:bg-gray-100 cursor-pointer rounded-lg text-sm p-2.5"
-          onClick={copyCode}
+          onClick={copyForWordPress}
           data-testid="copy-code"
         >
-          Copy Code <FaCopy className="ml-2" />
+          Copy for WordPress <FaCopy className="ml-2" />
         </span>
         <Button
           onClick={doOpenInCodepenio}
