@@ -1,13 +1,5 @@
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { useEffect } from "react";
 import { Stack } from "../../lib/stacks";
-import StackLabel from "../core/StackLabel";
 import DesignSystemSelector, {
   DesignSystemSelectorProps,
 } from "./DesignSystemSelector";
@@ -24,42 +16,30 @@ interface Props {
 function OutputSettingsSection({
   stack,
   setStack,
-  label = "Stack:",
-  shouldDisableUpdates = false,
+  label = "Output:",
   designSystem,
   inline = false,
 }: Props) {
-  const stackSelect = (
-    <Select
-      value={stack ?? ""}
-      onValueChange={(value: string) => setStack(value as Stack)}
-      disabled={shouldDisableUpdates}
+  useEffect(() => {
+    if (stack !== Stack.HTML_CSS) {
+      setStack(Stack.HTML_CSS);
+    }
+  }, [setStack, stack]);
+
+  const wordpressOutput = (
+    <div
+      className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+      data-testid="wordpress-output-mode"
     >
-      <SelectTrigger
-        className={inline ? "w-auto gap-2 font-medium" : "col-span-2"}
-        id="output-settings-js"
-        data-testid="stack-select"
-      >
-        <SelectValue placeholder="Select a stack" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {Object.values(Stack).map((stack) => (
-            <SelectItem key={stack} value={stack}>
-              <div className="flex items-center">
-                <StackLabel stack={stack} />
-              </div>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+      <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      WordPress HTML Widget
+    </div>
   );
 
   if (inline) {
     return (
       <div className="flex items-center gap-2">
-        {stackSelect}
+        {wordpressOutput}
         {designSystem && <DesignSystemSelector {...designSystem} compact />}
       </div>
     );
@@ -69,11 +49,9 @@ function OutputSettingsSection({
     <div className="flex flex-col gap-y-2 justify-between text-sm">
       <div className="grid grid-cols-3 items-center gap-4">
         <span>{label}</span>
-        {stackSelect}
+        <div className="col-span-2">{wordpressOutput}</div>
       </div>
-      {designSystem && (
-        <DesignSystemSelector {...designSystem} />
-      )}
+      {designSystem && <DesignSystemSelector {...designSystem} />}
     </div>
   );
 }
